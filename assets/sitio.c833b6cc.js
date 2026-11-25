@@ -7,7 +7,21 @@ avisoClave: 'optare-aviso-visto'
 };
 var doc = document;
 doc.documentElement.classList.remove('no-js');
-var btn = doc.querySelector('.menu-btn');
+var reducir = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+var objetivos = doc.querySelectorAll('[data-reveal]');
+if (objetivos.length && !reducir.matches && 'IntersectionObserver' in window) {
+var mostrarTodo = function () { objetivos.forEach(function (el) { el.classList.add('is-revealed'); }); };
+var obs = new IntersectionObserver(function (entradas) {
+entradas.forEach(function (en) {
+if (en.isIntersecting || en.boundingClientRect.top < 0) { en.target.classList.add('is-revealed'); obs.unobserve(en.target); }
+});
+}, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+doc.documentElement.classList.add('has-reveal');
+objetivos.forEach(function (el) { obs.observe(el); });
+var alCambiar = function (e) { if (e.matches) { obs.disconnect(); mostrarTodo(); } };
+if (reducir.addEventListener) { reducir.addEventListener('change', alCambiar); }
+}
+var btn = doc.querySelector('.navbar_menu-button');
 var nav = doc.getElementById('menu');
 if (btn && nav) {
 var cerrar = function () { nav.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
