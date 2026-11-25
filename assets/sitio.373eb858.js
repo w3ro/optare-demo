@@ -46,7 +46,20 @@ var abrir = function () { if (!dlg.open) { dlg.showModal(); } };
 doc.querySelectorAll('[data-abrir-aviso]').forEach(function (a) {
 a.addEventListener('click', function (e) { e.preventDefault(); abrir(); });
 });
-if (!visto) { setTimeout(abrir, 1800); }
+if (!visto) {
+var lanzado = false;
+var eventos = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
+var lanzar = function () {
+if (lanzado) { return; }
+lanzado = true;
+eventos.forEach(function (ev) { window.removeEventListener(ev, alMover); });
+if (!dlg.open && !visto) { abrir(); }
+};
+var alMover = function () { setTimeout(lanzar, 700); };
+eventos.forEach(function (ev) { window.addEventListener(ev, alMover, { passive: true, once: true }); });
+setTimeout(lanzar, 8000);
+dlg.addEventListener('close', function () { visto = true; });
+}
 }
 var form = doc.getElementById('form-contacto');
 if (form) {
